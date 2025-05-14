@@ -1,6 +1,7 @@
 // Header.js
 import React from 'react';
-import './Headeruser.css';
+import '../gestion/headeruser.css';
+
 
 const Header = ({ title }) => {
   return (
