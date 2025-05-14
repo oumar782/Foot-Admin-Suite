@@ -47,7 +47,7 @@ const AuthComponent = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('https://foot-admin-suite.vercel.app//auth/login', {
+      const response = await fetch('https://foot-admin-suite.vercel.app/auth/login', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
