@@ -21,7 +21,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "https://footspace-solutions.vercel.app", // ⚠️ Pas de / à la fin
-      "https://foot-admin-suite.vercel.app/"
+      "https://foot-admin-suite.vercel.app"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
