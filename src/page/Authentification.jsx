@@ -47,38 +47,34 @@ const AuthComponent = () => {
     setIsLoading(true);
     
     try {
-     // ... existing code ...
-     const response = await fetch('https://foot-admin-suite.vercel.app/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
+      const response = await fetch('https://foot-admin-suite.vercel.app/auth/login', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData),
+      });
 
-    let data;
-    try {
-      data = await response.json();
-    } catch (err) {
-      throw new Error("Réponse invalide du serveur (non JSON)");
-    }
+      const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.error || "Erreur lors de la connexion");
-    }
-
-    showMessage('Connexion réussie!', true);
-
-    // Store user info in localStorage
-    localStorage.setItem('userNom', nom);
-    localStorage.setItem('userRole', role);
-
-    setTimeout(() => {
-      if (role === 'Administrateur') {
-        window.location.href = '/administrateur.html';
-      } else if (role === 'Gestionnaire') {
-        window.location.href = '/bienvenues';
+      if (!response.ok) {
+        throw new Error(data.message || 'Erreur lors de la connexion');
       }
-    }, 2000);
-// ... existing code ...
+
+      showMessage('Connexion réussie!', true);
+
+      // Store user info in localStorage
+      localStorage.setItem('userNom', nom);
+      localStorage.setItem('userRole', role);
+
+      setTimeout(() => {
+        if (role === 'Administrateur') {
+          window.location.href = '/administrateur.html';
+        } else if (role === 'Gestionnaire') {
+          window.location.href = '/bienvenues';
+        }
+      }, 2000);
       
     } catch (error) {
       showMessage(error.message || 'Erreur de communication avec le serveur', false);
