@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../composant/Headeruser';
 import UserList from '../composant/UserList';
 import UserForm from '../composant/UserForm';
-import './utilisateur.css';
+import '../gestion/headeruser.css';
 
 const Utilisateur = () => {
   const [users, setUsers] = useState([]);
