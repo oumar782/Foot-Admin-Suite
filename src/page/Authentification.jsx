@@ -47,38 +47,38 @@ const AuthComponent = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('https://foot-admin-suite.vercel.app/auth/login', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          nom: nom,
-          email: email,
-          mdp: mdp,
-          role: role 
-        }),
-      });
+     // ... existing code ...
+     const response = await fetch('https://foot-admin-suite.vercel.app/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur de connexion');
+    let data;
+    try {
+      data = await response.json();
+    } catch (err) {
+      throw new Error("Réponse invalide du serveur (non JSON)");
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || "Erreur lors de la connexion");
+    }
+
+    showMessage('Connexion réussie!', true);
+
+    // Store user info in localStorage
+    localStorage.setItem('userNom', nom);
+    localStorage.setItem('userRole', role);
+
+    setTimeout(() => {
+      if (role === 'Administrateur') {
+        window.location.href = '/administrateur.html';
+      } else if (role === 'Gestionnaire') {
+        window.location.href = '/bienvenues';
       }
-
-      const data = await response.json();
-      showMessage('Connexion réussie!', true);
-      
-      // Stocker les informations utilisateur dans localStorage
-      localStorage.setItem('userNom', nom);
-      localStorage.setItem('userRole', role);
-      
-      setTimeout(() => {
-        if (role === 'Administrateur') {
-          window.location.href = '/administrateur.html';
-        } else if (role === 'Gestionnaire') {
-          window.location.href = '/bienvenues';
-        }
-      }, 2000);
+    }, 2000);
+// ... existing code ...
       
     } catch (error) {
       showMessage(error.message || 'Erreur de communication avec le serveur', false);
