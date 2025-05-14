@@ -79,7 +79,7 @@ const Utilisateur = () => {
         )}
         
         <div className="action-bars">
-          <h2>Liste des Utilisateurs</h2>
+          <h2>Liste des Utilisateurs:</h2>
           <button className="btn-primary" onClick={handleAddUser}>
              Ajouter un utilisateur
           </button>
