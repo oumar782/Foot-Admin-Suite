@@ -37,31 +37,32 @@ const AuthComponent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const { nom, email, mdp, role } = formData;
-    
-    if (!nom || !email || !mdp || !role) {
-      showMessage('Veuillez remplir tous les champs', false);
-      return;
-    }
-    
-    setIsLoading(true);
-    
     try {
       const response = await fetch('https://foot-admin-suite.vercel.app/auth/login', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
-
-      const data = await response.json();
-
+  
+      // Vérifiez d'abord si la réponse est OK
       if (!response.ok) {
-        throw new Error(data.message || 'Erreur lors de la connexion');
+        const errorData = await response.text();
+        throw new Error(errorData || 'Erreur de connexion');
       }
-
+  
+      // Ensuite seulement parsez le JSON
+      const data = await response.json();
+      
+      // Traitement de la réponse...
+      
+    } catch (error) {
+      console.error('Erreur:', error);
+      showMessage(error.message || 'Erreur serveur', false);
+    }
+  };
       showMessage('Connexion réussie!', true);
 
       // Store user info in localStorage
