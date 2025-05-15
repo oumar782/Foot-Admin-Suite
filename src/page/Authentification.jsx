@@ -15,13 +15,28 @@ const AuthComponent = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const showMessage = (text, isSuccess) => {
+    setMessage({ text, isSuccess, show: true });
+    setTimeout(() => setMessage(prev => ({ ...prev, show: false })), 5000);
+  };
+
+  const closeMessage = () => {
+    setMessage(prev => ({ ...prev, show: false }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-
+    
     try {
       const response = await fetch('https://foot-admin-suite.vercel.app/auth/login', {
         method: 'POST',
@@ -31,36 +46,39 @@ const AuthComponent = () => {
         },
         body: JSON.stringify(formData)
       });
-
-      // Vérification de la réponse
+  
+      // Vérifiez d'abord si la réponse est OK
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Erreur de connexion');
+        const errorData = await response.text();
+        throw new Error(errorData || 'Erreur de connexion');
       }
-
+  
+      // Ensuite seulement parsez le JSON
       const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.message || 'Authentification échouée');
-      }
-
-      // Stockage des données utilisateur
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setMessage({ text: 'Connexion réussie!', isSuccess: true, show: true });
-
-      // Redirection
-      setTimeout(() => {
-        window.location.href = data.user.role === 'Administrateur' 
-          ? '/administrateur.html' 
-          : '/bienvenues';
-      }, 1500);
-
+      
+      // Traitement de la réponse...
+      
     } catch (error) {
-      setMessage({
-        text: error.message || 'Erreur de communication avec le serveur',
-        isSuccess: false,
-        show: true
-      });
+      console.error('Erreur:', error);
+      showMessage(error.message || 'Erreur serveur', false);
+    }
+  };
+      showMessage('Connexion réussie!', true);
+
+      // Store user info in localStorage
+      localStorage.setItem('userNom', nom);
+      localStorage.setItem('userRole', role);
+
+      setTimeout(() => {
+        if (role === 'Administrateur') {
+          window.location.href = '/administrateur.html';
+        } else if (role === 'Gestionnaire') {
+          window.location.href = '/bienvenues';
+        }
+      }, 2000);
+      
+    } catch (error) {
+      showMessage(error.message || 'Erreur de communication avec le serveur', false);
       console.error('Erreur:', error);
     } finally {
       setIsLoading(false);

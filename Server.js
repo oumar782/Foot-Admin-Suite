@@ -3,8 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import authRoutes from './connexion.js';
-import demonstration from './BackendGestionnaire/ControlleurDemonstration/Demonstration.js';
+import authRoutes from './routes/authRoutes.js';
+import demonstrationRoutes from './routes/demonstrationRoutes.js';
 
 dotenv.config();
 
@@ -32,37 +32,33 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware pour les requêtes OPTIONS
+// Middleware pour les pré-vols OPTIONS
 app.options('*', cors(corsOptions));
 
 // Routes API
-app.use('/auth', authRoutes);
-app.use('/api/demonstrations', demonstration);
+app.use('/api/auth', authRoutes);
+app.use('/api/demonstrations', demonstrationRoutes);
 
 // Servir les fichiers statiques
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Routes React
-app.get([
-  '/',
-  '/bienvenues',
-  '/utilisateur',
-  '/Gestionclient',
-  '/Gestionreservation',
-  '/Gestionpartenariats',
-  '/Gestiondemonstration',
-  '/administrateur.html'
-], (req, res) => {
+// Gestion des routes React
+app.get(['/', '/bienvenues', '/administrateur', '/gestion/*'], (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-// Gestion des erreurs
+// Gestion des erreurs 404
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: 'Endpoint non trouvé' });
+});
+
+// Gestion des erreurs globales
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ success: false, message: 'Erreur serveur' });
+  console.error('Erreur:', err.stack);
+  res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
+  console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
 });
