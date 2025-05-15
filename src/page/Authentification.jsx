@@ -47,7 +47,12 @@ const AuthComponent = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('https://foot-admin-suite.vercel.app/api/auth/login', {
+      // Utilisation d'une URL dynamique selon l'environnement
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://foot-admin-suite.vercel.app/auth/login' 
+        : 'http://localhost:5000/auth/login';
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -56,7 +61,6 @@ const AuthComponent = () => {
         body: JSON.stringify(formData),
       });
 
-      // Correction: Suppression de la déclaration redondante de 'data'
       const data = await response.json();
 
       if (!response.ok) {
@@ -65,7 +69,6 @@ const AuthComponent = () => {
 
       showMessage('Connexion réussie!', true);
 
-      // Stockage des informations utilisateur dans localStorage
       localStorage.setItem('userNom', nom);
       localStorage.setItem('userRole', role);
 
