@@ -35,7 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'dist'))); // Pour les assets React compilés
 
 // Routes de l'api d'authentification
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 // Routes pour les demonstrations
 app.use('/api/demonstrations', demonstration);
 
