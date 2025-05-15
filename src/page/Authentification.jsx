@@ -47,9 +47,8 @@ const AuthComponent = () => {
     setIsLoading(true);
     
     try {
-      // Utilisation d'une URL dynamique selon l'environnement
       const apiUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://foot-admin-suite.vercel.app/auth/login' 
+        ? '/auth/login' 
         : 'http://localhost:5000/auth/login';
 
       const response = await fetch(apiUrl, {
@@ -59,23 +58,31 @@ const AuthComponent = () => {
           'Accept': 'application/json'
         },
         body: JSON.stringify(formData),
+        credentials: 'include'
       });
+
+      // Vérification du content-type avant de parser le JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(text || 'Réponse non-JSON du serveur');
+      }
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Erreur lors de la connexion');
+        throw new Error(data.message || `Erreur HTTP: ${response.status}`);
       }
 
       showMessage('Connexion réussie!', true);
 
-      localStorage.setItem('userNom', nom);
-      localStorage.setItem('userRole', role);
+      localStorage.setItem('userNom', data.user.nom);
+      localStorage.setItem('userRole', data.user.role);
 
       setTimeout(() => {
-        if (role === 'Administrateur') {
-          window.location.href = '/administrateur.html';
-        } else if (role === 'Gestionnaire') {
+        if (data.user.role === 'Administrateur') {
+          window.location.href = '/administrateur';
+        } else if (data.user.role === 'Gestionnaire') {
           window.location.href = '/bienvenues';
         }
       }, 2000);
@@ -180,7 +187,9 @@ const AuthComponent = () => {
               </div>
             </div>
             
-            <button type="submit" className="btn">Se connecter</button>
+            <button type="submit" className="btn" disabled={isLoading}>
+              {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+            </button>
           </form>
         </div>
       </div>

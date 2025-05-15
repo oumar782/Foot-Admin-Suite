@@ -1,67 +1,70 @@
 import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import authRoutes from './connexion.js';
-import demonstration from './BackendGestionnaire/ControlleurDemonstration/Demonstration.js';
+import db from './db.js';
 
-dotenv.config();
+const router = express.Router();
 
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Configuration CORS simplifiée
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://footspace-solutions.vercel.app",
-    "https://foot-admin-suite.vercel.app"
-  ],
-  credentials: true
-}));
-
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Routes API
-app.use('/auth', authRoutes);
-app.use('/api/demonstrations', demonstration);
-
-// Route de santé
-app.get('/health', (req, res) => res.status(200).send('OK'));
-
-// Routes React - Format corrigé
-const reactRoutes = [
-  '/bienvenues',
-  '/utilisateur',
-  '/Gestionclient',
-  '/Gestionreservation',
-  '/Gestionpartenariats',
-  '/Gestiondemonstration',
-  '/administrateur'
-];
-
-reactRoutes.forEach(route => {
-  app.get(route, (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-  });
+// Middleware pour logger les requêtes
+router.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
 });
 
-// Gestion des erreurs
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Server Error');
+// Route OPTIONS pour CORS
+router.options('/login', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.status(204).end();
 });
 
-export default app;
+// Route POST /login corrigée
+router.post('/login', async (req, res) => {
+  try {
+    const { nom, email, mdp, role } = req.body;
 
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+    // Validation des champs
+    if (!nom || !email || !mdp || !role) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tous les champs sont obligatoires',
+        required: ['nom', 'email', 'mdp', 'role']
+      });
+    }
+
+    // Requête SQL paramétrée
+    const result = await db.query(
+      `SELECT * FROM utilisateur
+       WHERE nom = $1 AND email = $2
+       AND motdepasse = $3 AND role = $4`,
+      [nom, email, mdp, role]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: 'Identifiants incorrects'
+      });
+    }
+
+    const user = result.rows[0];
+    
+    return res.status(200).json({
+      success: true,
+      message: 'Connexion réussie',
+      user: {
+        nom: user.nom,
+        email: user.email,
+        role: user.role
+      }
+    });
+
+  } catch (error) {
+    console.error('Erreur:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erreur interne du serveur'
+    });
+  }
+});
+
+export default router;
