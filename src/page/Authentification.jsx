@@ -49,24 +49,26 @@ const AuthComponent = () => {
     try {
       const response = await fetch('https://foot-admin-suite.vercel.app/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify(formData),
       });
-      
-      let data;
-      try {
-        data = await response.json(); // ça pète ici si c’est pas du JSON
-      } catch (err) {
-        throw new Error("Réponse invalide du serveur (non JSON)");
-      }
-      
+
+      // Correction: Suppression de la déclaration redondante de 'data'
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Erreur lors de la connexion');
+      }
+
       showMessage('Connexion réussie!', true);
-      
-      // Stocker les informations utilisateur dans localStorage
+
+      // Stockage des informations utilisateur dans localStorage
       localStorage.setItem('userNom', nom);
       localStorage.setItem('userRole', role);
-      
+
       setTimeout(() => {
         if (role === 'Administrateur') {
           window.location.href = '/administrateur.html';
