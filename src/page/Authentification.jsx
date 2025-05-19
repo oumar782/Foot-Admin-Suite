@@ -36,18 +36,19 @@ const AuthComponent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     const { nom, email, motdepasse, role } = formData;
 
+    // Tous les champs sont obligatoires
     if (!nom || !email || !motdepasse || !role) {
       showMessage('Veuillez remplir tous les champs', false);
       return;
     }
-
+    
     setIsLoading(true);
-
+    
     try {
-      const response = await fetch('https://foot-admin-suite.vercel.app/api/auth/login', {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nom, email, motdepasse, role })
@@ -83,8 +84,9 @@ const AuthComponent = () => {
           }
         }, 2000);
       } else {
-        showMessage('Données utilisateur invalides', false);
+        showMessage("Données utilisateur invalides", false);
       }
+
     } catch (error) {
       showMessage(error.message || 'Erreur de communication avec le serveur', false);
       console.error('Erreur:', error);
@@ -118,11 +120,11 @@ const AuthComponent = () => {
               <label htmlFor="nom">Nom complet</label>
               <div className="input-field">
                 <User className="input-icon" size={18} />
-                <input
-                  type="text"
-                  id="nom"
-                  name="nom"
-                  placeholder="Entrez votre nom complet"
+                <input 
+                  type="text" 
+                  id="nom" 
+                  name="nom" 
+                  placeholder="Entrez votre nom complet" 
                   value={formData.nom}
                   onChange={handleInputChange}
                   required
@@ -134,14 +136,14 @@ const AuthComponent = () => {
               <label htmlFor="email">Adresse email</label>
               <div className="input-field">
                 <Mail className="input-icon" size={18} />
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="Entrez votre email"
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  placeholder="Entrez votre email" 
                   value={formData.email}
                   onChange={handleInputChange}
-                  required
+                  required 
                 />
               </div>
             </div>
@@ -150,14 +152,14 @@ const AuthComponent = () => {
               <label htmlFor="motdepasse">Mot de passe</label>
               <div className="input-field">
                 <Lock className="input-icon" size={18} />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="motdepasse"
-                  name="motdepasse"
-                  placeholder="Mot de passe"
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  id="motdepasse" 
+                  name="motdepasse" 
+                  placeholder="Mot de passe" 
                   value={formData.motdepasse}
                   onChange={handleInputChange}
-                  required
+                  required 
                 />
                 {showPassword ? (
                   <EyeOff className="password-toggle" size={18} onClick={togglePasswordVisibility} />
@@ -171,25 +173,21 @@ const AuthComponent = () => {
               <label htmlFor="role">Rôle</label>
               <div className="input-field">
                 <UserCircle className="input-icon" size={18} />
-                <select
-                  id="role"
-                  name="role"
+                <select 
+                  id="role" 
+                  name="role" 
                   value={formData.role}
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="" disabled>
-                    Sélectionnez votre rôle
-                  </option>
+                  <option value="" disabled>Sélectionnez votre rôle</option>
                   <option value="Administrateur">Administrateur</option>
                   <option value="Gestionnaire">Gestionnaire</option>
                 </select>
               </div>
             </div>
 
-            <button type="submit" className="btn">
-              Se connecter
-            </button>
+            <button type="submit" className="btn">Se connecter</button>
           </form>
         </div>
       </div>
