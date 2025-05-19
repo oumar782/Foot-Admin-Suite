@@ -6,8 +6,16 @@ import demons from './Gestionnaire/Demonstration/demonstration.js';
 
 const app = express();
 
-// Middlewares essentiels
-app.use(cors());
+// Options CORS — ici tu peux limiter aux origines que tu veux, par exemple ton front
+const corsOptions = {
+  origin: 'https://foot-admin-suite.vercel.app', // l’URL de ton front déployé
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // méthodes autorisées
+  credentials: true, // si tu utilises les cookies ou l’authentification
+};
+
+app.use(cors(corsOptions));
+
+// Autres middlewares
 app.use(express.json());
 
 // Routes d'authentification
